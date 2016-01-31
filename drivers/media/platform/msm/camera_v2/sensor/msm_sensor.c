@@ -729,7 +729,7 @@ int32_t msm_sensor_init_gpio_pin_tbl(struct device_node *of_node,
 		CDBG("%s qcom,svdd1-en %d\n", __func__,
 			gconf->gpio_num_info->gpio_num[SENSOR_GPIO_CAM0_SVDD1_EN]);
 	}
-#endif	
+#endif
 #endif
 	return 0;
 

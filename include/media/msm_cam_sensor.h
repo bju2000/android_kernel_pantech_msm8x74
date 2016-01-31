@@ -50,14 +50,23 @@
 #define MAX_ACTUATOR_REGION 5
 #define MAX_ACTUATOR_INIT_SET 12
 #define MAX_ACTUATOR_REG_TBL_SIZE 8
+#define MAX_ACTUATOR_AF_TOTAL_STEPS 1024
 
 #define MOVE_NEAR 0
 #define MOVE_FAR  1
+
+#define MSM_ACTUATOR_MOVE_SIGNED_FAR -1
+#define MSM_ACTUATOR_MOVE_SIGNED_NEAR  1
 
 #define MAX_EEPROM_NAME 32
 
 #define MAX_AF_ITERATIONS 3
 #define MAX_NUMBER_OF_STEPS 47
+
+typedef enum sensor_stats_type {
+        YRGB,
+        YYYY,
+} sensor_stats_type_t;
 
 enum flash_type {
 	LED_FLASH = 1,
@@ -480,18 +489,20 @@ enum msm_actuator_cfg_type_t {
 	CFG_SET_DEFAULT_FOCUS,
 	CFG_SET_POSITION,
 	CFG_MOVE_FOCUS,
+        CFG_ACTUATOR_POWERDOWN,
 #ifdef CONFIG_PANTECH_CAMERA_ADD_OIS
 	CFG_SET_OIS_MODE,
 	CFG_SET_OIS_INFO_CTRL,
 	CFG_GET_OIS_INFO,
 #endif
 #ifdef CONFIG_PANTECH_CAMERA//F_PANTECH_CAMERA_ADD_RESET_FOCUS
-    CFG_SET_ACTUATOR_SW_LANDING,
+	CFG_SET_ACTUATOR_SW_LANDING,
 #endif
 };
 
 enum actuator_type {
 	ACTUATOR_VCM,
+        ACTUATOR_OIS,
 	ACTUATOR_PIEZO,
 #ifdef CONFIG_PANTECH_CAMERA
 	ACTUATOR_HVCM,
@@ -506,6 +517,11 @@ enum msm_actuator_data_type {
 enum msm_actuator_addr_type {
 	MSM_ACTUATOR_BYTE_ADDR = 1,
 	MSM_ACTUATOR_WORD_ADDR,
+};
+
+enum msm_actuator_i2c_operation {
+        MSM_ACT_WRITE = 0,
+        MSM_ACT_POLL,
 };
 
 struct reg_settings_t {
@@ -590,12 +606,12 @@ enum af_camera_name {
 
 #ifdef CONFIG_PANTECH_CAMERA_ADD_OIS
 struct pantech_ois_get_info_t {
-    uint16_t gyro_out_x;
-    uint16_t gyro_out_y;
-    uint16_t cal_gyro_out_x;
-    uint16_t cal_gyro_out_y;
-    uint16_t hall_out_x;
-    uint16_t hall_out_y;
+	uint16_t gyro_out_x;
+	uint16_t gyro_out_y;
+	uint16_t cal_gyro_out_x;
+	uint16_t cal_gyro_out_y;
+	uint16_t hall_out_x;
+	uint16_t hall_out_y;
 };
 #endif
 

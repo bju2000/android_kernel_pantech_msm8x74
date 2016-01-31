@@ -62,7 +62,7 @@ struct msm_actuator_func_tbl {
 	int32_t (*actuator_set_position)(struct msm_actuator_ctrl_t *,
 		struct msm_actuator_set_position_t *);
 #ifdef CONFIG_PANTECH_CAMERA//F_PANTECH_CAMERA_ADD_RESET_FOCUS
-    int32_t (*actuator_sw_landing)(struct msm_actuator_ctrl_t *);
+	int32_t (*actuator_sw_landing)(struct msm_actuator_ctrl_t *);
 #endif
 };
 
