@@ -1909,9 +1909,6 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 		case PR_GET_SECCOMP:
 			error = prctl_get_seccomp();
 			break;
-		case PR_SET_SECCOMP:
-			error = prctl_set_seccomp(arg2);
-			break;
 		case PR_GET_TSC:
 			error = GET_TSC_CTL(arg2);
 			break;
