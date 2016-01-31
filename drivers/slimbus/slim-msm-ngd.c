@@ -1031,11 +1031,9 @@ static int ngd_slim_rx_msgq_thread(void *data)
 
 	while (!kthread_should_stop()) {
 		set_current_state(TASK_INTERRUPTIBLE);
-		ret = wait_for_completion_interruptible(notify);
-		if (ret) {
-			dev_err(dev->dev, "rx thread wait err:%d", ret);
-			continue;
-		}
+		while (wait_for_completion_interruptible(
+			notify) != 0)
+			;
 		/* 1 irq notification per message */
 		if (dev->use_rx_msgqs != MSM_MSGQ_ENABLED) {
 			msm_slim_rx_dequeue(dev, (u8 *)buffer);
@@ -1073,14 +1071,12 @@ static int ngd_notify_slaves(void *data)
 	int ret, i = 0;
 	while (!kthread_should_stop()) {
 		set_current_state(TASK_INTERRUPTIBLE);
-		ret = wait_for_completion_timeout(&dev->qmi.slave_notify,
-								HZ);
-		if (!ret) {
-			dev_dbg(dev->dev, "slave thread wait err:%d", ret);
-			continue;
-		}
+		while (wait_for_completion_interruptible(
+			&dev->qmi.slave_notify) != 0)
+			;
 		/* Probe devices for first notification */
 		if (!i) {
+			i++;
 			dev->err = 0;
 			if (dev->dev->of_node)
 				of_register_slim_devices(&dev->ctrl);
@@ -1093,12 +1089,12 @@ static int ngd_notify_slaves(void *data)
 		} else {
 			slim_framer_booted(ctrl);
 		}
-		i++;
 		mutex_lock(&ctrl->m_ctrl);
 		list_for_each_safe(pos, next, &ctrl->devs) {
+			int j;
 			sbdev = list_entry(pos, struct slim_device, dev_list);
 			mutex_unlock(&ctrl->m_ctrl);
-			for (i = 0; i < LADDR_RETRY; i++) {
+			for (j = 0; j < LADDR_RETRY; j++) {
 				ret = slim_get_logical_addr(sbdev,
 						sbdev->e_addr,
 						6, &sbdev->laddr);
