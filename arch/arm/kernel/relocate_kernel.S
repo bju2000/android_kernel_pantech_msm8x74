@@ -61,6 +61,12 @@ relocate_new_kernel:
 	b 0b
 
 2:
+#ifdef CONFIG_KEXEC_HARDBOOT
+	ldr	r0, kexec_hardboot
+	teq	r0, #0
+	bne	hardboot
+#endif
+
 	/* Jump to relocated kernel */
 	mov lr,r1
 	mov r0,#0
@@ -68,6 +74,7 @@ relocate_new_kernel:
 	ldr r2,kexec_boot_atags
  ARM(	mov pc, lr	)
  THUMB(	bx lr		)
+
 #ifdef CONFIG_KEXEC_HARDBOOT
 hardboot:
 	/* Stash boot arguments in hardboot page:
@@ -113,7 +120,7 @@ loop:	b	loop
 #endif
 
 	.ltorg
-+#endif
+#endif
 	.align
 
 	.globl kexec_start_address
@@ -152,5 +159,6 @@ relocate_new_kernel_end:
 	.globl relocate_new_kernel_size
 relocate_new_kernel_size:
 	.long relocate_new_kernel_end - relocate_new_kernel
+
 
 

@@ -1011,8 +1011,6 @@ void __init setup_arch(char **cmdline_p)
 	}
 #endif
 	reserve_crashkernel();
-	reserve_crashkernel_1();
-
 	tcm_init();
 
 #ifdef CONFIG_MULTI_IRQ_HANDLER
@@ -1166,3 +1164,4 @@ const struct seq_operations cpuinfo_op = {
 	.stop	= c_stop,
 	.show	= c_show
 };
+

@@ -164,7 +164,7 @@ void machine_kexec(struct kimage *image)
 	mem_text_write_kernel_word(&kexec_indirection_page, page_list);
 	mem_text_write_kernel_word(&kexec_mach_type, machine_arch_type);
 	if (!kexec_boot_atags)
-		mem_text_write_kernel_word(&kexec_boot_atags, image->start - KEXEC_ARM_ZIMAGE_OFFSET  KEXEC_ARM_ATAGS_OFFSET);
+		mem_text_write_kernel_word(&kexec_boot_atags, image->start - KEXEC_ARM_ZIMAGE_OFFSET + KEXEC_ARM_ATAGS_OFFSET);
 #ifdef CONFIG_KEXEC_HARDBOOT
 	mem_text_write_kernel_word(&kexec_hardboot, image->hardboot);
 #endif
