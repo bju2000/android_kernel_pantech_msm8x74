@@ -15,7 +15,7 @@
 #export PATH=$(pwd)/../../toolchain_arm-eabi-4.6/arm-eabi-4.6/bin:$PATH
 
 export ARCH=arm
-export PATH=$(pwd)/../../../../arm-eabi-4.6/bin:$PATH
+export PATH=/home/chautruongthinh/cm13/prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin:$PATH
 export CROSS_COMPILE=arm-eabi-
 
 ##############################################################################
@@ -24,7 +24,7 @@ export CROSS_COMPILE=arm-eabi-
 mkdir -p ./obj/KERNEL_OBJ/
 #make O=./obj/KERNEL_OBJ/ 
 make ARCH=arm O=./obj/KERNEL_OBJ/ msm8974_ef63s_tp20_user_defconfig
-make -j8 ARCH=arm O=./obj/KERNEL_OBJ/ 2>&1 | tee kernel_log.txt
+make -j4 ARCH=arm O=./obj/KERNEL_OBJ/ 2>&1 | tee kernel_log.txt
 
 ##############################################################################
 # Copy Kernel Image
