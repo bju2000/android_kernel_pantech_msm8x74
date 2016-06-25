@@ -31,7 +31,6 @@
 
 //++ p11309 - 2013.12.22 for disabled by wcjeong
 #define PAN_IRQ_WORKQUEUE
-#define PAN_TSP_POWER_CTRL
 #define SKY_PROCESS_CMD_KEY
 
 //++ p13106 2014.1.16 for touchMonitor App
@@ -61,7 +60,6 @@
 #define TOUCH_BOOSTER_MIF_FRQ_3		206000	/* MIF 206MHz */
 #define TOUCH_BOOSTER_INT_FRQ_3		160000	/* INT 160MHz */
 #endif
-
 
 #define FIRMWARE_IC					"fts_ic"
 

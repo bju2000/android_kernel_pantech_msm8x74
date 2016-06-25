@@ -59,14 +59,33 @@
 #include "fts.h"
 #include "fts_ts.h"
 
+struct fts_ts_info *shared_info = NULL;
+
+#ifdef CONFIG_POWERSUSPEND
+#include <linux/powersuspend.h>
+static int fts_suspend(struct fts_ts_info *info);
+static int fts_resume(struct fts_ts_info *info);
+
+static void fts_early_suspend(struct power_suspend *h)
+{
+	fts_suspend(shared_info);
+}
+static void fts_late_resume(struct power_suspend *h)
+{
+	fts_resume(shared_info);
+}
+static struct power_suspend fts_power_suspend = {
+	.suspend = fts_early_suspend,
+	.resume = fts_late_resume,
+};
+#endif
+
 //++ p11309 - 2013.12.22 
 enum tsp_power_pin_type {
 	POWER_NOT_USED=0,
 	POWER_GPIO_SETUP,	// gpio setup
 	POWER_PM_REGULATOR,	// PMIC regulator setup
-	
 };
-
 
 enum gpio_direction {	
 	GPIO_OUTPUT_LOW=0,	// out port, default low
@@ -146,11 +165,6 @@ char* touch_error_info=NULL;
 
 static int fts_stop_device(struct fts_ts_info *info);
 static int fts_start_device(struct fts_ts_info *info);
-
-#ifdef PAN_TSP_POWER_CTRL
-static int fts_suspend(struct fts_ts_info * info);
-static int fts_resume(struct fts_ts_info * info);
-#endif
 
 int fts_wait_for_ready(struct fts_ts_info *info);
 
@@ -238,7 +252,7 @@ void fts_stylus_mode_onoff(struct fts_ts_info *info, unsigned char onoff)
 		regAdd[3] = 0x54;                    // set lower 1 byte value(0x54)
 		fts_write_reg(info, regAdd, 4);
 		regAdd[2] = 0x63;                    // set higher address
-		regAdd[3] = 0x01;                    // set upper 1 byte value.(0x0154 = 340)
+		regAdd[3] = 0x01;                    // set upper 1 byte value.(0x0154 =340)
 		fts_write_reg(info, regAdd, 4);
 	}
 
@@ -1573,8 +1587,6 @@ static int fts_probe(struct i2c_client *client, const struct i2c_device_id *idp)
 	info->panel_revision = info->board->panel_revision;
 	info->stop_device = fts_stop_device;
 	info->start_device = fts_start_device;
-	info->suspend = fts_suspend;
-	info->resume = fts_resume;
 	info->fts_command = fts_command;
 	info->fts_read_reg = fts_read_reg;
 	info->fts_write_reg = fts_write_reg;
@@ -1799,6 +1811,12 @@ static int fts_probe(struct i2c_client *client, const struct i2c_device_id *idp)
 
 	complete_all(&info->init_done);
 
+	shared_info = info;
+
+#ifdef CONFIG_POWERSUSPEND
+	register_power_suspend(&fts_power_suspend);
+#endif
+
 #ifdef PAN_KNOCK_ON
 	device_init_wakeup(info->dev, 1);
 #endif
@@ -1898,6 +1916,10 @@ static int fts_remove(struct i2c_client *client)
 
 #ifdef PAN_KNOCK_ON
 	device_init_wakeup(info->dev, 0);
+#endif
+
+#ifdef CONFIG_POWERSUSPEND
+	unregister_power_suspend(&fts_power_suspend);
 #endif
 
 	mutex_destroy(&info->lock);
@@ -2065,22 +2087,19 @@ out:
 
 }
 
-
-#ifdef PAN_TSP_POWER_CTRL
-static int fts_suspend(struct fts_ts_info * info)
+static int fts_suspend(struct fts_ts_info *info)
 {
 	dbg_cr("%s\n", __func__);
 	fts_stop_device(info);
 	return 0;
 }
 
-static int fts_resume(struct fts_ts_info * info)
+static int fts_resume(struct fts_ts_info *info)
 {
 	dbg_cr("%s\n", __func__);
 	fts_start_device(info);
 	return 0;
 }
-#endif
 
 static const struct i2c_device_id fts_device_id[] = {
 	{"stmicro_fts_ts", 0},
